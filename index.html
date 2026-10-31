@@ -9,7 +9,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <script>
         tailwind.config = {
             theme: {
@@ -53,10 +53,6 @@
 
         .gold-gradient-bg-hover:hover {
             background: linear-gradient(135deg, #ffe5a3 0%, #ebd076 50%, #c99a42 100%);
-        }
-
-        .gold-border {
-            border-color: rgba(223, 177, 91, 0.3);
         }
 
         .glass-card {
@@ -178,7 +174,7 @@
             <h1 class="font-serif text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-tight">
                 ARGANTARA GROUP
             </h1>
-            
+
             <p class="font-serif italic text-2xl sm:text-3xl font-light text-brand-goldLight mb-8 tracking-wide">
                 "Eksplorasi Tanpa Batas"
             </p>
@@ -194,6 +190,10 @@
                 </a>
                 <a href="#kontak" class="w-full sm:w-auto px-8 py-4 text-sm font-semibold tracking-wider text-white border border-brand-gold/40 hover:border-brand-gold rounded-full glass-card hover:bg-brand-deepPurple/50 transition-all duration-300 flex items-center justify-center">
                     HUBUNGI KAMI
+                </a>
+                <a href="assets/argantara-company-profile.pdf" target="_blank" class="w-full sm:w-auto px-8 py-4 text-sm font-semibold tracking-wider text-white border border-brand-gold/40 hover:border-brand-gold rounded-full glass-card hover:bg-brand-deepPurple/50 transition-all duration-300 flex items-center justify-center">
+                    <i class="fa-solid fa-file-pdf mr-2 text-brand-gold"></i>
+                    DOWNLOAD PROFILE
                 </a>
             </div>
 
@@ -480,9 +480,15 @@
                                     class="w-full bg-brand-purple/60 border border-brand-gold/20 rounded-xl px-4 py-3 text-white placeholder-gray-500 focus:outline-none focus:border-brand-gold transition-colors"></textarea>
                             </div>
 
-                            <button type="submit" class="w-full py-4 text-sm font-semibold tracking-wider text-brand-purple gold-gradient-bg gold-gradient-bg-hover rounded-xl shadow-xl shadow-brand-gold/15 transition-all duration-300 uppercase">
-                                Kirim Pesan Eksklusif
-                            </button>
+                            <div class="flex flex-col sm:flex-row gap-4">
+                                <button type="submit" class="flex-1 py-4 text-sm font-semibold tracking-wider text-brand-purple gold-gradient-bg gold-gradient-bg-hover rounded-xl shadow-xl shadow-brand-gold/15 transition-all duration-300 uppercase">
+                                    Kirim Pesan Eksklusif
+                                </button>
+                                <a href="assets/argantara-company-profile.pdf" target="_blank" class="flex-1 py-4 text-sm font-semibold tracking-wider text-white border border-brand-gold/40 hover:border-brand-gold rounded-xl glass-card hover:bg-brand-deepPurple/50 transition-all duration-300 uppercase text-center">
+                                    <i class="fa-solid fa-file-pdf mr-2 text-brand-gold"></i>
+                                    Profile PDF
+                                </a>
+                            </div>
                         </form>
                     </div>
                 </div>
