@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argantara Group | Capital Markets & Asset Management</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js untuk visualisasi portofolio interaktif -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cinzel (Serif Luxury) & Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#07070a',
+                            panel: '#0e0b16',
+                            purple: '#2a114b',
+                            accent: '#471868',
+                            gold: '#dfb15b',
+                            goldLight: '#f3d69b',
+                            goldDark: '#997126'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #07070a;
+            color: #f3f4f6;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #FFF0D0 0%, #DFB15B 50%, #997126 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .gold-border {
+            border-color: rgba(223, 177, 91, 0.3);
+        }
+
+        .glass-card {
+            background: rgba(14, 11, 22, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(223, 177, 91, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 20px rgba(71, 24, 104, 0.2);
+        }
+
+        .glass-card-hover {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .glass-card-hover:hover {
+            transform: translateY(-4px);
+            border-color: rgba(223, 177, 91, 0.5);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.8), 0 0 30px rgba(223, 177, 91, 0.25);
+        }
+
+        .gold-btn {
+            background: linear-gradient(135deg, #dfb15b 0%, #b88933 100%);
+            color: #07070a;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .gold-btn:hover {
+            background: linear-gradient(135deg, #f4ce88 0%, #cf9c3f 100%);
+            box-shadow: 0 0 25px rgba(223, 177, 91, 0.4);
+        }
+
+        /* Marquee Ticker Animation */
+        @keyframes marquee {
+            0% { transform: translateX(0%); }
+            100% { transform: translateX(-50%); }
+        }
+        .ticker-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .ticker-move {
+            display: inline-block;
+            animation: marquee 35s linear infinite;
+        }
+        .ticker-move:hover {
+            animation-play-state: paused;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #07070a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(223, 177, 91, 0.3);
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(223, 177, 91, 0.6);
+        }
+
+        /* Floating Widget Animations */
+        @keyframes pulse-gold {
+            0% { box-shadow: 0 0 0 0 rgba(223, 177, 91, 0.6); }
+            70% { box-shadow: 0 0 0 15px rgba(223, 177, 91, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(223, 177, 91, 0); }
+        }
+        .pulse-trigger {
+            animation: pulse-gold 2.5s infinite;
+        }
+        .hidden-widget {
+            opacity: 0;
+            transform: scale(0.85) translateY(20px);
+            pointer-events: none;
+        }
+        .visible-widget {
+            opacity: 1;
+            transform: scale(1) translateY(0);
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-[#dfb15b]/30 selection:text-[#dfb15b]">
+
+    <!-- NAV BAR -->
+    <header class="fixed top-0 left-0 right-0 z-40 bg-[#07070a]/90 backdrop-blur-md border-b border-[#dfb15b]/20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-[#dfb15b] to-[#2a114b] p-[1px] flex items-center justify-center">
+                    <div class="w-full h-full bg-[#07070a] rounded-lg flex items-center justify-center">
+                        <span class="font-cinzel font-bold text-[#dfb15b] text-lg">A</span>
+                    </div>
+                </div>
+                <div>
+                    <span class="font-cinzel text-lg md:text-xl font-bold tracking-widest text-white block leading-none">ARGANTARA</span>
+                    <span class="text-[9px] font-sans tracking-[0.25em] text-[#dfb15b] uppercase block mt-1">Capital Markets</span>
+                </div>
+            </div>
+
+            <!-- Desktop Menu -->
+            <nav class="hidden md:flex items-center space-x-8 text-xs font-medium tracking-wider uppercase text-slate-300">
+                <a href="#about" class="hover:text-[#dfb15b] transition-colors">Tentang Kami</a>
+                <a href="#pillars" class="hover:text-[#dfb15b] transition-colors">Pilar Investasi</a>
+                <a href="#simulator" class="hover:text-[#dfb15b] transition-colors">Portofolio & Analytics</a>
+                <a href="#governance" class="hover:text-[#dfb15b] transition-colors">Kepemimpinan</a>
+            </nav>
+
+            <div class="flex items-center space-x-4">
+                <button onclick="toggleWidget()" class="gold-btn px-4 py-2 rounded-lg text-xs tracking-wider uppercase flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Portal Klien
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- LIVE MARKET TICKER BANNER -->
+    <div class="mt-20 bg-[#0c0915] border-b border-[#dfb15b]/20 py-2.5 font-mono text-xs text-slate-300">
+        <div class="ticker-wrap max-w-full">
+            <div class="ticker-move flex items-center space-x-8">
+                <!-- Market Index Items -->
+                <span class="flex items-center gap-2">
+                    <span class="text-slate-400">XAU/USD (Gold)</span>
+                    <span class="text-white">$2,745.80</span>
+                    <span class="text-emerald-400"><i class="fa-solid fa-caret-up"></i> +0.85%</span>
+                </span>
+                <span class="text-slate-700">|</span>
+                <span class="flex items-center gap-2">
+                    <span class="text-slate-400">S&P 500</span>
+                    <span class="text-white">5,815.20</span>
+                    <span class="text-emerald-400"><i class="fa-solid fa-caret-up"></i> +0.42%</span>
+                </span>
+                <span class="text-slate-700">|</span>
+                <span class="flex items-center gap-2">
+                    <span class="text-slate-400">NASDAQ 100</span>
+                    <span class="text-white">20,380.50</span>
+                    <span class="text-emerald-400"><i class="fa-solid fa-caret-up"></i> +0.68%</span>
+                </span>
+                <span class="text-slate-700">|</span>
+                <span class="flex items-center gap-2">
+                    <span class="text-slate-400">USD/IDR</span>
+                    <span class="text-white">15,620.00</span>
+                    <span class="text-rose-400"><i class="fa-solid fa-caret-down"></i> -0.15%</span>
+                </span>
+                <span class="text-slate-700">|</span>
+                <span class="flex items-center gap-2">
+                    <span class="text-slate-400">GLOBAL AGGREGATE BOND</span>
+                    <span class="text-white">104.12</span>
+                    <span class="text-emerald-400"><i class="fa-solid fa-caret-up"></i> +0.18%</span>
+                </span>
+                <span class="text-slate-700">|</span>
+                <span class="flex items-center gap-2">
+                    <span class="text-slate-400">ARGANTARA QUANT INDEX</span>
+                    <span class="text-white">1,482.90</span>
+                    <span class="text-emerald-400"><i class="fa-solid fa-caret-up"></i> +1.45%</span>
+                </span>
+                <span class="text-slate-700">|</span>
+                <!-- Duplicate for seamless loop -->
+                <span class="flex items-center gap-2">
+                    <span class="text-slate-400">XAU/USD (Gold)</span>
+                    <span class="text-white">$2,745.80</span>
+                    <span class="text-emerald-400"><i class="fa-solid fa-caret-up"></i> +0.85%</span>
+                </span>
+                <span class="text-slate-700">|</span>
+                <span class="flex items-center gap-2">
+                    <span class="text-slate-400">S&P 500</span>
+                    <span class="text-white">5,815.20</span>
+                    <span class="text-emerald-400"><i class="fa-solid fa-caret-up"></i> +0.42%</span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- EXECUTIVE HERO SECTION -->
+    <section class="relative min-h-[85vh] flex items-center justify-center pt-16 pb-24 overflow-hidden">
+        <!-- Background Lighting Glows -->
+        <div class="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#2a114b]/40 rounded-full blur-[140px] pointer-events-none"></div>
+        <div class="absolute bottom-10 right-10 w-[350px] h-[350px] bg-[#dfb15b]/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10 space-y-8">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#dfb15b]/30 bg-[#dfb15b]/5 text-[#dfb15b] text-xs font-semibold tracking-widest uppercase">
+                <i class="fa-solid fa-chart-line"></i> Institutional Grade Asset Management
+            </div>
+
+            <h1 class="font-cinzel text-4xl sm:text-6xl md:text-7xl font-extrabold text-white tracking-tight leading-tight">
+                ARGANTARA GROUP
+                <span class="block gold-gradient-text mt-2">CAPITAL MARKETS</span>
+            </h1>
+
+            <p class="text-slate-300 text-base md:text-xl max-w-3xl mx-auto font-light leading-relaxed">
+                Presisi institusional. Strategi eksekusi kuantitatif canggih. Dan pengelolaan portofolio pasar modal berkelas dunia di bawah navigasi kepemimpinan <strong>Zeon Geofano</strong>.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                <button onclick="toggleWidget()" class="gold-btn px-8 py-4 rounded-xl text-sm font-bold tracking-wider uppercase w-full sm:w-auto shadow-xl">
+                    <i class="fa-solid fa-briefcase mr-2"></i> Konsultasi Investasi Institusi
+                </button>
+                <a href="#simulator" class="px-8 py-4 rounded-xl border border-[#dfb15b]/40 text-[#dfb15b] hover:bg-[#dfb15b]/10 transition-all text-sm font-semibold tracking-wider uppercase w-full sm:w-auto">
+                    <i class="fa-solid fa-chart-pie mr-2"></i> Visualisasi Portofolio
+                </a>
+            </div>
+
+            <!-- Key Metric Counters -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 pt-12 border-t border-[#dfb15b]/20">
+                <div class="glass-card p-4 rounded-xl text-center">
+                    <span class="block font-cinzel text-2xl md:text-3xl font-bold text-white">Global</span>
+                    <span class="text-[11px] text-slate-400 uppercase tracking-widest mt-1 block">Pasar Target</span>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center">
+                    <span class="block font-cinzel text-2xl md:text-3xl font-bold text-[#dfb15b]">Multi-Asset</span>
+                    <span class="text-[11px] text-slate-400 uppercase tracking-widest mt-1 block">Strategi Portofolio</span>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center">
+                    <span class="block font-cinzel text-2xl md:text-3xl font-bold text-white">Algorithmic</span>
+                    <span class="text-[11px] text-slate-400 uppercase tracking-widest mt-1 block">Manajemen Risiko</span>
+                </div>
+                <div class="glass-card p-4 rounded-xl text-center">
+                    <span class="block font-cinzel text-2xl md:text-3xl font-bold text-[#dfb15b]">24/7</span>
+                    <span class="text-[11px] text-slate-400 uppercase tracking-widest mt-1 block">Dukungan Aetheria AI</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INVESTMENT PILLARS (CORE OFFERINGS) -->
+    <section id="pillars" class="py-20 relative bg-[#090710] border-t border-[#dfb15b]/15">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center space-y-3 mb-16">
+                <span class="text-xs font-semibold tracking-[0.25em] text-[#dfb15b] uppercase">Arsitektur Solusi</span>
+                <h2 class="font-cinzel text-3xl sm:text-4xl font-bold text-white">Pilar Layanan Pasar Modal</h2>
+                <div class="w-16 h-[2px] bg-[#dfb15b] mx-auto mt-4"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Pillar 1 -->
+                <div class="glass-card glass-card-hover p-6 rounded-2xl space-y-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#2a114b] border border-[#dfb15b]/40 flex items-center justify-center text-[#dfb15b] text-xl">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <h3 class="font-cinzel text-lg font-bold text-white">Global Equities & Capital Markets</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Pengelolaan ekuitas institusional berbasis riset fundamental mendalam dan analisis teknikal makroekonomi pasar global.
+                    </p>
+                    <ul class="text-[11px] text-slate-300 space-y-2 pt-2 border-t border-white/5">
+                        <li><i class="fa-solid fa-check text-[#dfb15b] mr-1"></i> Stock Selection Kustom</li>
+                        <li><i class="fa-solid fa-check text-[#dfb15b] mr-1"></i> Hedging Risiko Hedged Portfolio</li>
+                    </ul>
+                </div>
+
+                <!-- Pillar 2 -->
+                <div class="glass-card glass-card-hover p-6 rounded-2xl space-y-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#2a114b] border border-[#dfb15b]/40 flex items-center justify-center text-[#dfb15b] text-xl">
+                        <i class="fa-solid fa-crown"></i>
+                    </div>
+                    <h3 class="font-cinzel text-lg font-bold text-white">Private Wealth Advisory</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Layanan manajemen kekayaan khusus bagi High-Net-Worth Individuals (HNWI) dan entitas korporat privat.
+                    </p>
+                    <ul class="text-[11px] text-slate-300 space-y-2 pt-2 border-t border-white/5">
+                        <li><i class="fa-solid fa-check text-[#dfb15b] mr-1"></i> Bespoke Asset Allocation</li>
+                        <li><i class="fa-solid fa-check text-[#dfb15b] mr-1"></i> Family Office Advisory</li>
+                    </ul>
+                </div>
+
+                <!-- Pillar 3 -->
+                <div class="glass-card glass-card-hover p-6 rounded-2xl space-y-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#2a114b] border border-[#dfb15b]/40 flex items-center justify-center text-[#dfb15b] text-xl">
+                        <i class="fa-solid fa-brain"></i>
+                    </div>
+                    <h3 class="font-cinzel text-lg font-bold text-white">Quantitative & Algorithmic</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Implementasi algoritma frekuensi tinggi dan model data AI untuk meminimalkan *drawdown* serta mengoptimalkan imbal hasil.
+                    </p>
+                    <ul class="text-[11px] text-slate-300 space-y-2 pt-2 border-t border-white/5">
+                        <li><i class="fa-solid fa-check text-[#dfb15b] mr-1"></i> Automated Risk Controls</li>
+                        <li><i class="fa-solid fa-check text-[#dfb15b] mr-1"></i> Systematic Execution</li>
+                    </ul>
+                </div>
+
+                <!-- Pillar 4 -->
+                <div class="glass-card glass-card-hover p-6 rounded-2xl space-y-4">
+                    <div class="w-12 h-12 rounded-xl bg-[#2a114b] border border-[#dfb15b]/40 flex items-center justify-center text-[#dfb15b] text-xl">
+                        <i class="fa-solid fa-building-columns"></i>
+                    </div>
+                    <h3 class="font-cinzel text-lg font-bold text-white">Fixed Income & Bonds</h3>
+                    <p class="text-xs text-slate-400 leading-relaxed">
+                        Strategi instrumen pendapatan tetap, obligasi pemerintah & korporat untuk stabilitas arus kas dan perlindungan modal.
+                    </p>
+                    <ul class="text-[11px] text-slate-300 space-y-2 pt-2 border-t border-white/5">
+                        <li><i class="fa-solid fa-check text-[#dfb15b] mr-1"></i> Sovereign & Corporate Debt</li>
+                        <li><i class="fa-solid fa-check text-[#dfb15b] mr-1"></i> Yield Optimization</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PORTFOLIO SIMULATOR & ANALYTICS WIDGET -->
+    <section id="simulator" class="py-20 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card p-6 md:p-10 rounded-3xl space-y-8">
+                <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 border-b border-[#dfb15b]/20 pb-6">
+                    <div>
+                        <span class="text-xs font-semibold tracking-widest text-[#dfb15b] uppercase">Argantara Analytics Terminal</span>
+                        <h2 class="font-cinzel text-2xl md:text-3xl font-bold text-white mt-1">Simulator Alokasi Portofolio Investasi</h2>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <button onclick="updateStrategy('balanced')" id="btn-balanced" class="px-4 py-2 rounded-lg text-xs font-semibold border border-[#dfb15b]/40 bg-[#dfb15b]/20 text-[#dfb15b] transition-all">Moderate Growth</button>
+                        <button onclick="updateStrategy('aggressive')" id="btn-aggressive" class="px-4 py-2 rounded-lg text-xs font-semibold border border-[#dfb15b]/20 text-slate-400 hover:text-white transition-all">Aggressive Alpha</button>
+                        <button onclick="updateStrategy('conservative')" id="btn-conservative" class="px-4 py-2 rounded-lg text-xs font-semibold border border-[#dfb15b]/20 text-slate-400 hover:text-white transition-all">Capital Preservation</button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-center">
+                    <!-- Chart Graphic -->
+                    <div class="lg:col-span-2 bg-[#08060f] p-4 sm:p-6 rounded-2xl border border-white/5 relative">
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-chart-area text-[#dfb15b] mr-1.5"></i> Projected Growth Trajectory (5 Years)</span>
+                            <span class="text-xs font-semibold text-emerald-400 font-mono" id="projectedYield">+64.8% Projected</span>
+                        </div>
+                        <div class="h-64 sm:h-80 w-full">
+                            <canvas id="portfolioChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Slider Controls & Breakdown -->
+                    <div class="space-y-6">
+                        <div class="space-y-4 bg-[#120e1e] p-5 rounded-2xl border border-[#dfb15b]/20">
+                            <h4 class="font-cinzel text-sm font-bold text-white border-b border-white/10 pb-2">Komposisi Alokasi Aset</h4>
+                            
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-mono">
+                                    <span class="text-slate-300">Global Equities</span>
+                                    <span class="text-[#dfb15b] font-bold" id="val-equities">50%</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                    <div id="bar-equities" class="bg-[#dfb15b] h-full transition-all duration-500" style="width: 50%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-mono">
+                                    <span class="text-slate-300">Fixed Income & Bonds</span>
+                                    <span class="text-[#dfb15b] font-bold" id="val-bonds">30%</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                    <div id="bar-bonds" class="bg-[#b88933] h-full transition-all duration-500" style="width: 30%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-2">
+                                <div class="flex justify-between text-xs font-mono">
+                                    <span class="text-slate-300">Quant & Commodities</span>
+                                    <span class="text-[#dfb15b] font-bold" id="val-quant">20%</span>
+                                </div>
+                                <div class="w-full bg-slate-800 h-1.5 rounded-full overflow-hidden">
+                                    <div id="bar-quant" class="bg-[#471868] h-full transition-all duration-500" style="width: 20%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 rounded-xl bg-[#2a114b]/30 border border-[#dfb15b]/30 text-xs text-slate-300 space-y-2">
+                            <div class="flex items-center gap-2 text-[#dfb15b] font-semibold">
+                                <i class="fa-solid fa-shield-halved"></i> Fitur Proteksi Portofolio:
+                            </div>
+                            <p class="text-[11px] text-slate-400">
+                                Sistem pengawasan risiko kuantitatif aktif 24/7 memantau volatilitas pasar modal untuk mengamankan ekuitas pokok klien.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- EXECUTIVE LEADERSHIP & GOVERNANCE -->
+    <section id="governance" class="py-20 bg-[#0a0812] border-t border-[#dfb15b]/15">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="glass-card p-8 md:p-12 rounded-3xl relative overflow-hidden">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
+                    <!-- Profile Card -->
+                    <div class="text-center md:border-r border-[#dfb15b]/20 md:pr-8 space-y-4">
+                        <div class="w-32 h-32 rounded-full mx-auto bg-gradient-to-tr from-[#dfb15b] via-[#2a114b] to-[#07070a] p-1 shadow-2xl">
+                            <div class="w-full h-full rounded-full bg-[#07070a] flex items-center justify-center">
+                                <span class="font-cinzel font-bold text-3xl text-[#dfb15b]">ZG</span>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="font-cinzel text-xl font-bold text-white tracking-wide">Zeon Geofano</h3>
+                            <p class="text-xs text-[#dfb15b] uppercase tracking-widest font-semibold mt-1">Founder & Chief Executive Officer</p>
+                        </div>
+                    </div>
+
+                    <!-- Executive Statement -->
+                    <div class="md:col-span-2 space-y-6">
+                        <div class="text-xs font-semibold tracking-widest text-[#dfb15b] uppercase flex items-center gap-2">
+                            <i class="fa-solid fa-quote-left"></i> Pesan Kepemimpinan Korporat
+                        </div>
+                        <p class="font-serif italic text-lg sm:text-xl text-slate-200 leading-relaxed">
+                            "Transformasi Argantara Group ke sektor pasar modal adalah wujud komitmen kami dalam menghadirkan tata kelola investasi berstandar global. Kami memadukan disiplin manajemen risiko yang ketat dengan inovasi kuantitatif terbaik."
+                        </p>
+                        <div class="flex items-center gap-6 pt-4 border-t border-white/10 text-xs text-slate-400">
+                            <div>
+                                <span class="block font-bold text-white text-sm">Argantara Group</span>
+                                <span>Holding Enterprise</span>
+                            </div>
+                            <div class="w-[1px] h-8 bg-white/10"></div>
+                            <div>
+                                <span class="block font-bold text-[#dfb15b] text-sm">Global Standards</span>
+                                <span>Institutional Governance</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER & REGULATORY DISCLAIMER -->
+    <footer class="bg-[#050408] border-t border-[#dfb15b]/20 pt-16 pb-12 text-slate-400 text-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <!-- Col 1: Corporate Info -->
+                <div class="space-y-4 md:col-span-2">
+                    <div class="flex items-center space-x-3">
+                        <span class="font-cinzel font-bold text-xl text-white tracking-widest">ARGANTARA GROUP</span>
+                    </div>
+                    <p class="text-slate-400 max-w-md leading-relaxed">
+                        Entitas korporat penyedia strategi bisnis terpadu, transformasi teknologi, dan solusi manajemen investasi pasar modal berkelas dunia.
+                    </p>
+                    <div class="text-slate-300 font-mono space-y-1 pt-2">
+                        <p><i class="fa-solid fa-envelope text-[#dfb15b] mr-2"></i> zeon@argantara.com</p>
+                        <p><i class="fa-solid fa-phone text-[#dfb15b] mr-2"></i> +62 857-7541-9443</p>
+                        <p><i class="fa-solid fa-globe text-[#dfb15b] mr-2"></i> www.argantara.com</p>
+                    </div>
+                </div>
+
+                <!-- Col 2: Navigation Links -->
+                <div class="space-y-3">
+                    <h4 class="font-cinzel text-sm font-bold text-white uppercase tracking-wider">Navigasi Utama</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#about" class="hover:text-[#dfb15b] transition-colors">Profil Korporat</a></li>
+                        <li><a href="#pillars" class="hover:text-[#dfb15b] transition-colors">Layanan Pasar Modal</a></li>
+                        <li><a href="#simulator" class="hover:text-[#dfb15b] transition-colors">Terminal Analytics</a></li>
+                        <li><a href="#governance" class="hover:text-[#dfb15b] transition-colors">Struktur Kepemimpinan</a></li>
+                    </ul>
+                </div>
+
+                <!-- Col 3: Compliance & Legal -->
+                <div class="space-y-3">
+                    <h4 class="font-cinzel text-sm font-bold text-white uppercase tracking-wider">Tata Kelola & Legal</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#" class="hover:text-[#dfb15b] transition-colors">Kebijakan Privasi Klien</a></li>
+                        <li><a href="#" class="hover:text-[#dfb15b] transition-colors">Standar Manajemen Risiko</a></li>
+                        <li><a href="#" class="hover:text-[#dfb15b] transition-colors">Laporan Tata Kelola (GCG)</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Disclaimer Box -->
+            <div class="p-4 rounded-xl bg-[#090710] border border-white/5 text-[11px] text-slate-500 leading-relaxed space-y-2">
+                <p class="font-semibold text-slate-400">DISCLAIMER PASAR MODAL & INVESTASI:</p>
+                <p>
+                    Kinerja masa lalu dari portofolio atau simulasi kuantitatif bukan merupakan jaminan hasil di masa mendatang. Seluruh aktivitas pengelolaan modal dan investasi mengandung risiko fluktuasi nilai pasar modal. Materi dalam situs ini disajikan hanya untuk tujuan informasi institusional Argantara Group dan bukan merupakan bujukan langsung transaksi tanpa konsultasi resmi.
+                </p>
+            </div>
+
+            <!-- Bottom Copyright -->
+            <div class="flex flex-col sm:flex-row items-center justify-between border-t border-white/5 pt-8 text-[11px]">
+                <p>&copy; 2026 Argantara Group (Argantara Capital Holdings). All Rights Reserved.</p>
+                <p class="mt-2 sm:mt-0 font-mono text-slate-500">Secured with Enterprise Encryption</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- WIDGET INTEGRATION (FLOATING WHATSAPP CHAT WIDGET) -->
+    <div class="fixed bottom-6 right-6 z-50 flex flex-col items-end">
+        <!-- POPUP CHAT WINDOW -->
+        <div id="chatWidgetBox" class="chat-widget-box hidden-widget glass-card w-[90vw] sm:w-[380px] rounded-2xl overflow-hidden mb-4 shadow-2xl">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-[#120524] via-[#1e0a38] to-[#0f0c1c] p-4 border-b border-[#dfb15b]/20 flex items-center justify-between">
+                <div class="flex items-center space-x-3">
+                    <div class="relative">
+                        <div class="w-10 h-10 rounded-full bg-gradient-to-tr from-[#dfb15b] to-[#120524] p-[1.5px]">
+                            <div class="w-full h-full rounded-full bg-[#120524] flex items-center justify-center font-serif font-bold text-xs text-[#dfb15b]">
+                                ZG
+                            </div>
+                        </div>
+                        <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-[#120524] rounded-full"></span>
+                    </div>
+                    <div>
+                        <h4 class="text-xs font-bold text-white tracking-wide">Zeon Geofano <i class="fa-solid fa-circle-check text-[#dfb15b] text-[10px]"></i></h4>
+                        <p class="text-[10px] text-slate-400">Founder & CEO • <span class="text-emerald-400">Online</span></p>
+                    </div>
+                </div>
+                <button onclick="toggleWidget()" class="text-slate-400 hover:text-white p-1">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <!-- Messages Body -->
+            <div class="p-4 space-y-3 max-h-[300px] overflow-y-auto bg-[#07070a]/80 text-xs">
+                <div class="text-center">
+                    <span class="text-[9px] uppercase tracking-widest text-slate-500 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
+                        Aetheria AI Assistant • Argantara Capital
+                    </span>
+                </div>
+                <div class="flex items-start space-x-2">
+                    <div class="w-6 h-6 rounded-full bg-[#2a114b] border border-[#dfb15b]/40 flex items-center justify-center text-[10px] text-[#dfb15b] shrink-0 mt-0.5">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <div class="bg-[#150f24] border border-[#dfb15b]/20 rounded-xl p-3 text-slate-300 leading-relaxed shadow">
+                        Selamat datang di <strong>Argantara Group Capital Markets</strong>.
+                        <br><br>
+                        Ada yang bisa asisten virtual <em>Aetheria</em> bantu terkait konsultasi portofolio atau kerja sama investasi institusional Anda?
+                    </div>
+                </div>
+
+                <!-- Quick Buttons -->
+                <div class="pl-8 space-y-1.5">
+                    <button onclick="sendQuickOption('Saya ingin berkonsultasi mengenai strategi alokasi portofolio pasar modal Argantara Group.')" class="w-full text-left text-[11px] text-slate-300 hover:text-white bg-[#171128] hover:bg-[#dfb15b]/20 border border-[#dfb15b]/30 rounded-lg p-2 transition-all flex items-center justify-between">
+                        <span><i class="fa-solid fa-chart-line text-[#dfb15b] mr-1.5"></i> Konsultasi Pasar Modal</span>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-slate-500"></i>
+                    </button>
+                    <button onclick="sendQuickOption('Saya ingin menjadwalkan pertemuan privat dengan CEO Zeon Geofano.')" class="w-full text-left text-[11px] text-slate-300 hover:text-white bg-[#171128] hover:bg-[#dfb15b]/20 border border-[#dfb15b]/30 rounded-lg p-2 transition-all flex items-center justify-between">
+                        <span><i class="fa-solid fa-calendar-check text-[#dfb15b] mr-1.5"></i> Pertemuan Privat CEO</span>
+                        <i class="fa-solid fa-chevron-right text-[9px] text-slate-500"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Input Form -->
+            <div class="p-3 bg-[#0c0915] border-t border-[#dfb15b]/20">
+                <form onsubmit="handleChatSubmit(event)" class="flex items-center gap-2">
+                    <input type="text" id="customMessage" placeholder="Pesan untuk Argantara Group..." required class="flex-1 bg-[#150f24] border border-[#dfb15b]/20 rounded-lg px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-[#dfb15b]">
+                    <button type="submit" class="gold-btn w-8 h-8 rounded-lg flex items-center justify-center shrink-0 text-xs">
+                        <i class="fa-solid fa-paper-plane"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- TRIGGER BUTTON -->
+        <button id="triggerBtn" onclick="toggleWidget()" class="pulse-trigger relative w-14 h-14 rounded-full bg-gradient-to-br from-[#120524] via-[#2a114b] to-[#07070a] border-2 border-[#dfb15b] flex items-center justify-center text-[#dfb15b] shadow-2xl hover:scale-105 transition-all">
+            <i class="fa-brands fa-whatsapp text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC FOR SIMULATOR & WIDGET -->
+    <script>
+        // WhatsApp Settings
+        const TARGET_WA_NUMBER = "6285775419443";
+
+        function toggleWidget() {
+            const widgetBox = document.getElementById('chatWidgetBox');
+            if (widgetBox.classList.contains('hidden-widget')) {
+                widgetBox.classList.remove('hidden-widget');
+                widgetBox.classList.add('visible-widget');
+            } else {
+                widgetBox.classList.remove('visible-widget');
+                widgetBox.classList.add('hidden-widget');
+            }
+        }
+
+        function openWhatsApp(textMessage) {
+            const encodedText = encodeURIComponent(textMessage);
+            window.open(`https://wa.me/${TARGET_WA_NUMBER}?text=${encodedText}`, '_blank');
+        }
+
+        function handleChatSubmit(e) {
+            e.preventDefault();
+            const input = document.getElementById('customMessage');
+            if (input.value.trim()) {
+                openWhatsApp(input.value.trim());
+                input.value = '';
+            }
+        }
+
+        function sendQuickOption(text) {
+            openWhatsApp(text);
+        }
+
+        // CHART.JS INITIALIZATION FOR PORTFOLIO SIMULATOR
+        let portfolioChart;
+
+        const strategies = {
+            balanced: {
+                label: 'Moderate Growth Strategy',
+                data: [100, 112, 128, 142, 164.8],
+                yieldText: '+64.8% Projected (5 Yrs)',
+                equities: '50%', bonds: '30%', quant: '20%'
+            },
+            aggressive: {
+                label: 'Aggressive Alpha Strategy',
+                data: [100, 122, 148, 175, 215.4],
+                yieldText: '+115.4% Projected (5 Yrs)',
+                equities: '70%', bonds: '10%', quant: '20%'
+            },
+            conservative: {
+                label: 'Capital Preservation Strategy',
+                data: [100, 106, 113, 121, 131.2],
+                yieldText: '+31.2% Projected (5 Yrs)',
+                equities: '25%', bonds: '60%', quant: '15%'
+            }
+        };
+
+        window.onload = function() {
+            const ctx = document.getElementById('portfolioChart').getContext('2d');
+            
+            // Gradient fill for chart
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(223, 177, 91, 0.4)');
+            gradient.addColorStop(1, 'rgba(42, 17, 75, 0.0)');
+
+            portfolioChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Tahun 0', 'Tahun 1', 'Tahun 2', 'Tahun 3', 'Tahun 4 (Proyeksi)'],
+                    datasets: [{
+                        label: 'Proyeksi Pertumbuhan Portfolio Indexed',
+                        data: strategies.balanced.data,
+                        borderColor: '#dfb15b',
+                        borderWidth: 3,
+                        backgroundColor: gradient,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#dfb15b',
+                        pointBorderColor: '#07070a',
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } }
+                        }
+                    }
+                }
+            });
+        };
+
+        function updateStrategy(type) {
+            const st = strategies[type];
+            portfolioChart.data.datasets[0].data = st.data;
+            portfolioChart.update();
+
+            document.getElementById('projectedYield').innerText = st.yieldText;
+            
+            document.getElementById('val-equities').innerText = st.equities;
+            document.getElementById('bar-equities').style.width = st.equities;
+            
+            document.getElementById('val-bonds').innerText = st.bonds;
+            document.getElementById('bar-bonds').style.width = st.bonds;
+
+            document.getElementById('val-quant').innerText = st.quant;
+            document.getElementById('bar-quant').style.width = st.quant;
+
+            // Reset Active Class on Buttons
+            ['balanced', 'aggressive', 'conservative'].forEach(b => {
+                const btn = document.getElementById(`btn-${b}`);
+                if (b === type) {
+                    btn.className = "px-4 py-2 rounded-lg text-xs font-semibold border border-[#dfb15b]/40 bg-[#dfb15b]/20 text-[#dfb15b] transition-all";
+                } else {
+                    btn.className = "px-4 py-2 rounded-lg text-xs font-semibold border border-[#dfb15b]/20 text-slate-400 hover:text-white transition-all";
+                }
+            });
+        }
+    </script>
+</body>
+</html>
